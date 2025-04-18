@@ -1,0 +1,59 @@
+package com.example.core.controller;
+
+import com.example.core.models.Chat;
+import com.example.core.service.ChatService;
+import com.example.core.service.TelegramIntegrationService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/chats")
+public class ChatController {
+    private ChatService chatService;
+    private TelegramIntegrationService telegramService;
+
+    @Autowired
+    public ChatController(ChatService chatService, TelegramIntegrationService telegramService) {
+        this.chatService = chatService;
+        this.telegramService = telegramService;
+    }
+
+    // Получить все чаты
+    @GetMapping
+    public ResponseEntity<List<Chat>> getAllChats() {
+        return ResponseEntity.ok(chatService.getAllChats());
+    }
+
+    // Получить чат по ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Chat> getChatById(@PathVariable Long id) {
+        return chatService.getChatById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // Обновить список чатов (синхронизация с Telegram)
+    @PostMapping("/sync")
+    public ResponseEntity<Void> syncChats() {
+        chatService.syncChatsWithTelegram();
+        return ResponseEntity.ok().build();
+    }
+
+    // Удалить чат по ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteChat(@PathVariable Long id) {
+        chatService.deleteChat(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Подписаться на чат по ID
+    @PostMapping("/subscribe/{id}")
+    public ResponseEntity<List<Long>> subscribeToChat(@PathVariable Long id) {
+        List<Long> result = telegramService.subscribeChats(List.of(id));
+        return ResponseEntity.ok(result);
+    }
+}
