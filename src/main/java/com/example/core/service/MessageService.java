@@ -25,6 +25,7 @@ public class MessageService implements IMessageService {
                 .map(message -> new MessageDto(
                         message.getId(),
                         message.getText(),
+                        message.getSummary(),
                         message.getTimestamp(),
                         message.getSender()
                 ))

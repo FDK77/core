@@ -18,6 +18,8 @@ public class Chat {
 
     private Type type;
 
+    private String filter;
+
     @ManyToMany
     @JoinTable(
             name = "chat_user",
@@ -26,13 +28,12 @@ public class Chat {
     )
     private Set<User> users;
 
-    @OneToOne(mappedBy = "chat", cascade = CascadeType.ALL)
-    private Filter filter;
+
 
     public Chat() {
     }
 
-    public Chat(Long chatId, String title, boolean summarize, Type type, Set<User> users, Filter filter) {
+    public Chat(Long chatId, String title, boolean summarize, Type type, Set<User> users, String filter) {
         this.chatId = chatId;
         this.title = title;
         this.summarize = summarize;
@@ -65,11 +66,11 @@ public class Chat {
         this.users = users;
     }
 
-    public Filter getFilter() {
+    public String getFilter() {
         return filter;
     }
 
-    public void setFilter(Filter filter) {
+    public void setFilter(String filter) {
         this.filter = filter;
     }
 

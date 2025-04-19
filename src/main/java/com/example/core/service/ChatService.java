@@ -24,8 +24,6 @@ public class ChatService implements IChatService {
         this.tgService = tgService;
     }
 
-    @Autowired
-
 
     public void syncChatsWithTelegram() {
         List<Map<String, Object>> telegramChats = tgService.getAllChats();
@@ -74,6 +72,17 @@ public class ChatService implements IChatService {
             chatRepo.saveAll(chatsToSave);
         }
 
+    }
+
+    public void updateChatSettings(Long chatId, String filter, Boolean summarize) {
+        chatRepo.findById(chatId).ifPresent(chat -> {
+            chat.setFilter(filter);
+            chat.setSummarize(summarize);
+            chatRepo.save(chat);
+        });
+        List<Long> chatIdsWithSubs = getChatIdsWithSummarizeOrFilter();
+        System.out.println(chatIdsWithSubs);
+        tgService.subscribeChats(chatIdsWithSubs);
     }
 
     public List<Chat> getAllChats() {

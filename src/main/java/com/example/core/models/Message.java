@@ -3,6 +3,7 @@ package com.example.core.models;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "message")
@@ -10,10 +11,12 @@ public class Message {
 
     @Id
     private Long id;
-
+    @Column(columnDefinition = "TEXT")
     private String text;
 
-    private LocalDateTime timestamp;
+    private OffsetDateTime timestamp;
+    @Column(columnDefinition = "TEXT")
+    private String summary;
 
     @ManyToOne
     @JoinColumn(name = "chat_id", referencedColumnName = "chatId")
@@ -25,9 +28,11 @@ public class Message {
 
     public Message() {}
 
-    public Message(String text, LocalDateTime timestamp, Chat chat, User sender) {
+    public Message(Long id, String text, OffsetDateTime timestamp, String summary, Chat chat, User sender) {
+        this.id = id;
         this.text = text;
         this.timestamp = timestamp;
+        this.summary = summary;
         this.chat = chat;
         this.sender = sender;
     }
@@ -48,12 +53,20 @@ public class Message {
         this.text = text;
     }
 
-    public LocalDateTime getTimestamp() {
+    public OffsetDateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
+    public void setTimestamp(OffsetDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     public Chat getChat() {

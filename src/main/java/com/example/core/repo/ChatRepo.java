@@ -10,4 +10,5 @@ public interface ChatRepo extends JpaRepository<Chat, Long> {
 
     @Query("SELECT c.chatId FROM Chat c WHERE c.summarize = true OR c.filter IS NOT NULL")
     List<Long> findAllChatIdsWithSummarizeOrFilter();
+
 }

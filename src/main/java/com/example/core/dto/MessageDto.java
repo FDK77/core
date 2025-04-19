@@ -4,20 +4,23 @@ import com.example.core.models.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class MessageDto {
     private Long id;
     private String text;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime timestamp;
+    private String summary;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
+    private OffsetDateTime timestamp;
     private User sender;
 
     public MessageDto() {
     }
 
-    public MessageDto(Long id, String text, LocalDateTime timestamp, User sender) {
+    public MessageDto(Long id, String text, String summary, OffsetDateTime timestamp, User sender) {
         this.id = id;
         this.text = text;
+        this.summary = summary;
         this.timestamp = timestamp;
         this.sender = sender;
     }
@@ -38,11 +41,19 @@ public class MessageDto {
         this.text = text;
     }
 
-    public LocalDateTime getTimestamp() {
+    public OffsetDateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public void setTimestamp(OffsetDateTime timestamp) {
         this.timestamp = timestamp;
     }
 

@@ -1,8 +1,8 @@
-package com.example.core.rabbit;
+package com.example.core.rabbit.telegram;
 
 
+import com.example.core.dto.TelegramRawMessageDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import static com.example.core.config.RabbitConfig.TELEGRAM_TO_CORE_QUEUE;
 @Component
 public class TelegramMessageConsumer {
 
-    private  TelegramMessageHandlerService handlerService;
+    private TelegramMessageHandlerService handlerService;
     private  ObjectMapper objectMapper;
 
 
@@ -24,14 +24,11 @@ public class TelegramMessageConsumer {
         this.objectMapper = objectMapper;
     }
 
-    @RabbitListener(queues = TELEGRAM_TO_CORE_QUEUE)
-    public void handleTelegramMessage(String messageJson) {
-        try {
-            Map<String, Object> message = objectMapper.readValue(messageJson, Map.class);
-            handlerService.handleMessageFromTelegram(message);
-        } catch (Exception e) {
-            System.err.println("Ошибка при обработке сообщения от Telegram: " + e.getMessage());
-        }
+    @RabbitListener(queues = "telegram.to_core")
+    public void handleTelegramMessage(TelegramRawMessageDto rawDto) {
+        System.out.println("Получено сообщение от Telegram-модуля: " + rawDto);
+        handlerService.handleMessageFromTelegram(rawDto);
     }
+
 }
 
