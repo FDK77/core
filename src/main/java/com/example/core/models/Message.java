@@ -19,6 +19,10 @@ public class Message {
     private String summary;
 
     @ManyToOne
+    @JoinColumn(name = "filter_id")
+    private Filter filter;
+
+    @ManyToOne
     @JoinColumn(name = "chat_id", referencedColumnName = "chatId")
     private Chat chat;
 
@@ -28,11 +32,12 @@ public class Message {
 
     public Message() {}
 
-    public Message(Long id, String text, OffsetDateTime timestamp, String summary, Chat chat, User sender) {
+    public Message(Long id, String text, OffsetDateTime timestamp, String summary, Filter filter, Chat chat, User sender) {
         this.id = id;
         this.text = text;
         this.timestamp = timestamp;
         this.summary = summary;
+        this.filter = filter;
         this.chat = chat;
         this.sender = sender;
     }
@@ -51,6 +56,14 @@ public class Message {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public Filter getFilter() {
+        return filter;
+    }
+
+    public void setFilter(Filter filter) {
+        this.filter = filter;
     }
 
     public OffsetDateTime getTimestamp() {

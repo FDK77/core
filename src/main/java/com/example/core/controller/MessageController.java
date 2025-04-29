@@ -33,5 +33,24 @@ public class MessageController {
         }
     }
 
+    @GetMapping("/filter/{fid}")
+    public ResponseEntity<?> getMessagesByChatIdAndFilterId(@PathVariable Long fid) {
+        try {
+            List<MessageDto> messages = messageService.getAllMessagesDtoByFilterId(fid);
+            return ResponseEntity.ok(messages);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/filter/{fid}")
+    public ResponseEntity<?> deleteMessagesByFilterId(@PathVariable Long fid) {
+        try {
+            messageService.deleteAllMessagesForFilter(fid);
+            return ResponseEntity.ok("All messages for filter with ID " + fid + " were successfully deleted");
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
 
 }

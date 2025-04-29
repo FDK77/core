@@ -12,8 +12,6 @@ public interface IChatService {
 
     Optional<Chat> getChatById(Long id);
 
-    List<Long> getChatIdsWithSummarizeOrFilter();
-
     void syncChatsWithTelegram();
 
     Chat saveChat(Chat chat);

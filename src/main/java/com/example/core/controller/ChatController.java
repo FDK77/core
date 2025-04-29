@@ -1,5 +1,6 @@
 package com.example.core.controller;
 
+import com.example.core.dto.ChatDto;
 import com.example.core.dto.ChatSettingDto;
 import com.example.core.models.Chat;
 import com.example.core.service.ChatService;
@@ -24,8 +25,8 @@ public class ChatController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Chat>> getAllChats() {
-        return ResponseEntity.ok(chatService.getAllChats());
+    public ResponseEntity<List<ChatDto>> getAllChats() {
+        return ResponseEntity.ok(chatService.getAllChatsDto());
     }
 
     @GetMapping("/{id}")
@@ -48,15 +49,15 @@ public class ChatController {
     }
 
     @PostMapping("/settings")
-    public ResponseEntity<Void> updateChatSettings(@RequestBody ChatSettingDto chatRequest) {
-        chatService.updateChatSettings(chatRequest.getChatId(), chatRequest.getFilter(), chatRequest.getSummary());
+    public ResponseEntity<Void> updateChatSettings(@RequestBody ChatSettingDto chatSettingDto) {
+        chatService.updateChatSettings(chatSettingDto);
         return ResponseEntity.ok().build();
     }
-
 
     @PostMapping("/subscribe/{id}")
     public ResponseEntity<List<Long>> subscribeToChat(@PathVariable Long id) {
         List<Long> result = telegramService.subscribeChats(List.of(id));
         return ResponseEntity.ok(result);
     }
+
 }

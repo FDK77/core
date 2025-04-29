@@ -1,16 +1,16 @@
 package com.example.core.dto;
 
+import java.util.List;
+
 public class ChatSettingDto {
     private Long chatId;
-    private String filter;
-    private Boolean summary;
+    private List<FilterDto> filters;
 
     public ChatSettingDto() {}
 
-    public ChatSettingDto(Long chatId, String filter, Boolean summary) {
+    public ChatSettingDto(Long chatId, List<FilterDto> filters) {
         this.chatId = chatId;
-        this.filter = filter;
-        this.summary = summary;
+        this.filters = filters;
     }
 
     public Long getChatId() {
@@ -21,19 +21,11 @@ public class ChatSettingDto {
         this.chatId = chatId;
     }
 
-    public String getFilter() {
-        return filter;
+    public List<FilterDto> getFilters() {
+        return filters;
     }
 
-    public void setFilter(String filter) {
-        this.filter = filter;
-    }
-
-    public Boolean getSummary() {
-        return summary;
-    }
-
-    public void setSummary(Boolean summary) {
-        this.summary = summary;
+    public void setFilters(List<FilterDto> filters) {
+        this.filters = filters;
     }
 }

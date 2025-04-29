@@ -2,6 +2,7 @@ package com.example.core.service;
 
 import com.example.core.dto.LlmResultMessageDto;
 import com.example.core.models.Chat;
+import com.example.core.models.Filter;
 import com.example.core.models.Message;
 import com.example.core.models.User;
 import com.example.core.service.interfaces.ILlmResultProcessingService;
@@ -20,12 +21,15 @@ public class LlmResultProcessingService implements ILlmResultProcessingService {
     private UserService userService;
     private MessageService messageService;
 
+    private FilterService filterService;
+
     private TelegramIntegrationService telegramIntegrationService;
     @Autowired
-    public LlmResultProcessingService(ChatService chatService, UserService userService, MessageService messageService, TelegramIntegrationService telegramIntegrationService) {
+    public LlmResultProcessingService(ChatService chatService, UserService userService, MessageService messageService, FilterService filterService, TelegramIntegrationService telegramIntegrationService) {
         this.chatService = chatService;
         this.userService = userService;
         this.messageService = messageService;
+        this.filterService = filterService;
         this.telegramIntegrationService = telegramIntegrationService;
     }
 
@@ -49,7 +53,7 @@ public class LlmResultProcessingService implements ILlmResultProcessingService {
                     User newUser = new User(dto.getUserid(), username, displayName, avatarPath);
                     return userService.saveUser(newUser);
                 });
-
+                Filter filter = filterService.findById(dto.getMatch());
                 LocalDateTime localTime = dto.getTimestamp().toLocalDateTime();
                 Message message = new Message();
                 message.setId(dto.getMessageid());
@@ -58,6 +62,7 @@ public class LlmResultProcessingService implements ILlmResultProcessingService {
                 message.setChat(chat);
                 message.setSender(user);
                 message.setSummary(dto.getSummary());
+                message.setFilter(filter);
 
                 messageService.saveMessage(message);
 

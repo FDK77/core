@@ -1,29 +1,30 @@
 package com.example.core.dto;
 
+import com.example.core.models.Filter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 public class LlmRequestDto implements Serializable {
     private long messageid;
     private long chatid;
     private long userid;
     private String text;
-    private String filter;
-    private boolean summary;
+    private Set<FilterToLlmDto> filters;
     private String timestamp;
 
     public LlmRequestDto() {
     }
 
-    public LlmRequestDto(long messageid, long chatid, long userid, String text, String filter, boolean summary, String timestamp) {
+    public LlmRequestDto(long messageid, long chatid, long userid, String text, Set<FilterToLlmDto> filters, String timestamp) {
         this.messageid = messageid;
         this.chatid = chatid;
         this.userid = userid;
         this.text = text;
-        this.filter = filter;
-        this.summary = summary;
+        this.filters = filters;
         this.timestamp = timestamp;
     }
 
@@ -43,20 +44,12 @@ public class LlmRequestDto implements Serializable {
         this.text = text;
     }
 
-    public String getFilter() {
-        return filter;
+    public Set<FilterToLlmDto> getFilters() {
+        return filters;
     }
 
-    public void setFilter(String filter) {
-        this.filter = filter;
-    }
-
-    public boolean isSummary() {
-        return summary;
-    }
-
-    public void setSummary(boolean summary) {
-        this.summary = summary;
+    public void setFilters(Set<FilterToLlmDto> filters) {
+        this.filters = filters;
     }
 
     public String getTimestamp() {

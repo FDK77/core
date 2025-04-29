@@ -10,16 +10,19 @@ public class LlmResultMessageDto {
     private OffsetDateTime timestamp;
     private String summary;
 
+    private Long match;
+
     public LlmResultMessageDto() {
     }
 
-    public LlmResultMessageDto(long messageid, long chatid, long userid, String text, OffsetDateTime timestamp, String summary) {
+    public LlmResultMessageDto(long messageid, long chatid, long userid, String text, OffsetDateTime timestamp, String summary, Long match) {
         this.messageid = messageid;
         this.chatid = chatid;
         this.userid = userid;
         this.text = text;
         this.timestamp = timestamp;
         this.summary = summary;
+        this.match = match;
     }
 
     public long getMessageid() {
@@ -68,5 +71,13 @@ public class LlmResultMessageDto {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public Long getMatch() {
+        return match;
+    }
+
+    public void setMatch(Long match) {
+        this.match = match;
     }
 }

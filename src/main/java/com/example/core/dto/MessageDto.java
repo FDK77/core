@@ -14,6 +14,7 @@ public class MessageDto {
     private OffsetDateTime timestamp;
     private User sender;
 
+
     public MessageDto() {
     }
 

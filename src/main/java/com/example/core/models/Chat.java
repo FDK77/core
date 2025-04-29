@@ -3,6 +3,7 @@ package com.example.core.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -14,11 +15,13 @@ public class Chat {
 
     private String title;
 
-    private boolean summarize;
-
     private Type type;
 
-    private String filter;
+    private String avatar;
+
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<Filter> filters = new HashSet<>();
+
 
     @ManyToMany
     @JoinTable(
@@ -33,13 +36,13 @@ public class Chat {
     public Chat() {
     }
 
-    public Chat(Long chatId, String title, boolean summarize, Type type, Set<User> users, String filter) {
+    public Chat(Long chatId, String title, Type type, String avatar, Set<Filter> filters, Set<User> users) {
         this.chatId = chatId;
         this.title = title;
-        this.summarize = summarize;
         this.type = type;
+        this.avatar = avatar;
+        this.filters = filters;
         this.users = users;
-        this.filter = filter;
     }
 
     public Long getChatId() {
@@ -66,20 +69,20 @@ public class Chat {
         this.users = users;
     }
 
-    public String getFilter() {
-        return filter;
+    public Set<Filter> getFilters() {
+        return filters;
     }
 
-    public void setFilter(String filter) {
-        this.filter = filter;
+    public void setFilters(Set<Filter> filters) {
+        this.filters = filters;
     }
 
-    public boolean isSummarize() {
-        return summarize;
+    public String getAvatar() {
+        return avatar;
     }
 
-    public void setSummarize(boolean summarize) {
-        this.summarize = summarize;
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public Type getType() {

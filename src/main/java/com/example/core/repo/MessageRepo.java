@@ -11,4 +11,10 @@ public interface MessageRepo extends JpaRepository<Message,Long> {
     @Query("SELECT m FROM Message m WHERE m.chat.chatId = :id")
     List<Message> findAllByChatId(@Param("id") Long id);
 
+    @Query("SELECT m FROM Message m WHERE m.filter.id = :id")
+    List<Message> findAllByFilterId(@Param("id") Long id);
+
+    @Query("DELETE FROM Message m WHERE m.filter.id = :filterId")
+    void deleteAllByFilterId(Long filterId);
+
 }
