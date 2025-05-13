@@ -8,31 +8,27 @@ import java.time.OffsetDateTime;
 @Entity
 @Table(name = "message")
 public class Message {
-
     @Id
     private Long id;
     @Column(columnDefinition = "TEXT")
     private String text;
-
     private OffsetDateTime timestamp;
     @Column(columnDefinition = "TEXT")
     private String summary;
-
     @ManyToOne
     @JoinColumn(name = "filter_id")
     private Filter filter;
-
     @ManyToOne
     @JoinColumn(name = "chat_id", referencedColumnName = "chatId")
     private Chat chat;
-
     @ManyToOne
     @JoinColumn(name = "sender_id", referencedColumnName = "userId")
     private User sender;
+    private boolean checked;
 
     public Message() {}
 
-    public Message(Long id, String text, OffsetDateTime timestamp, String summary, Filter filter, Chat chat, User sender) {
+    public Message(Long id, String text, OffsetDateTime timestamp, String summary, Filter filter, Chat chat, User sender, boolean checked) {
         this.id = id;
         this.text = text;
         this.timestamp = timestamp;
@@ -40,6 +36,7 @@ public class Message {
         this.filter = filter;
         this.chat = chat;
         this.sender = sender;
+        this.checked = checked;
     }
 
     public Long getId() {
@@ -60,6 +57,14 @@ public class Message {
 
     public Filter getFilter() {
         return filter;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
     }
 
     public void setFilter(Filter filter) {

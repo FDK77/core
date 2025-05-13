@@ -3,6 +3,8 @@ package com.example.core.service;
 
 import com.example.core.dto.FilterToLlmDto;
 import com.example.core.dto.MessageDto;
+import com.example.core.models.Chat;
+import com.example.core.models.Filter;
 import com.example.core.models.Message;
 import com.example.core.repo.MessageRepo;
 import com.example.core.service.interfaces.IMessageService;
@@ -19,13 +21,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class MessageService implements IMessageService {
-    private MessageRepo messageRepo;
-    private FilterService filterService;
-    private ModelMapper modelMapper;
+    private final MessageRepo messageRepo;
+    private final FilterService filterService;
+    private final ChatService chatService;
+    private final ModelMapper modelMapper;
+
     @Autowired
-    public MessageService(MessageRepo messageRepo, FilterService filterService, ModelMapper modelMapper) {
+    public MessageService(MessageRepo messageRepo, FilterService filterService, ChatService chatService, ModelMapper modelMapper) {
         this.messageRepo = messageRepo;
         this.filterService = filterService;
+        this.chatService = chatService;
         this.modelMapper = modelMapper;
     }
 
@@ -41,14 +46,18 @@ public class MessageService implements IMessageService {
                 .toList();
     }
 
+    @Transactional
     public List<MessageDto> getAllMessagesDtoByFilterId(Long filterId) {
         List<Message> messages = messageRepo.findAllByFilterId(filterId);
-        List<MessageDto> massageDto = messages.stream()
+        messageRepo.markAllAsCheckedByFilterId(filterId);
+        return messages.stream()
                 .map(m -> modelMapper.map(m, MessageDto.class))
                 .collect(Collectors.toList());
-        return massageDto;
     }
-
+    public Optional<Message> getLatestMessageByChat(Chat chat) {
+        List<Message> messages = messageRepo.findTop1ByChatOrderByTimestampDesc(chat);
+        return messages.isEmpty() ? Optional.empty() : Optional.of(messages.get(0));
+    }
 
     public List<Message> getAllMessages() {
         return messageRepo.findAll();
@@ -67,11 +76,16 @@ public class MessageService implements IMessageService {
     }
     @Transactional
     public void deleteAllMessagesForFilter(Long filterId) {
-        try {
-            filterService.findById(filterId);
-            messageRepo.deleteAllByFilterId(filterId);
-        } catch (IllegalArgumentException e) {
-            throw new EntityNotFoundException("Filter with ID " + filterId + " not found");
-        }
+        Filter filter = filterService.findById(filterId);
+        Chat chat = filter.getChat();
+        messageRepo.deleteAllByFilterId(filterId);
+        String newLast = getLatestMessageByChat(chat)
+                .map(Message::getText)
+                .orElse(null);
+        chat.setLastMessage(newLast);
+        chatService.saveChat(chat);
     }
+
+
+
 }

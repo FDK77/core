@@ -9,20 +9,15 @@ import java.util.Set;
 @Entity
 @Table(name = "chat")
 public class Chat {
-
     @Id
     private Long chatId;
-
     private String title;
-
     private Type type;
-
     private String avatar;
-
+    @Column(columnDefinition = "TEXT")
+    private String lastMessage;
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Filter> filters = new HashSet<>();
-
-
     @ManyToMany
     @JoinTable(
             name = "chat_user",
@@ -36,11 +31,12 @@ public class Chat {
     public Chat() {
     }
 
-    public Chat(Long chatId, String title, Type type, String avatar, Set<Filter> filters, Set<User> users) {
+    public Chat(Long chatId, String title, Type type, String avatar, String lastMessage, Set<Filter> filters, Set<User> users) {
         this.chatId = chatId;
         this.title = title;
         this.type = type;
         this.avatar = avatar;
+        this.lastMessage = lastMessage;
         this.filters = filters;
         this.users = users;
     }
@@ -79,6 +75,14 @@ public class Chat {
 
     public String getAvatar() {
         return avatar;
+    }
+
+    public String getLastMessage() {
+        return lastMessage;
+    }
+
+    public void setLastMessage(String lastMessage) {
+        this.lastMessage = lastMessage;
     }
 
     public void setAvatar(String avatar) {

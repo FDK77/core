@@ -13,16 +13,22 @@ public class ChatDto {
     private Long chatId;
     private String title;
     private Type type;
-    private List<FilterDto> filters;
 
+    private String avatar;
+
+    private String lastMessage;
+
+    private Boolean unreadMessages;
     public ChatDto() {
     }
 
-    public ChatDto(Long chatId, String title, Type type, List<FilterDto> filters) {
+    public ChatDto(Long chatId, String title, Type type, String avatar, String lastMessage, Boolean unreadMessages) {
         this.chatId = chatId;
         this.title = title;
         this.type = type;
-        this.filters = filters;
+        this.avatar = avatar;
+        this.lastMessage = lastMessage;
+        this.unreadMessages = unreadMessages;
     }
 
     public Long getChatId() {
@@ -49,11 +55,28 @@ public class ChatDto {
         this.type = type;
     }
 
-    public List<FilterDto> getFilters() {
-        return filters;
+
+    public String getAvatar() {
+        return avatar;
     }
 
-    public void setFilters(List<FilterDto> filters) {
-        this.filters = filters;
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getLastMessage() {
+        return lastMessage;
+    }
+
+    public void setLastMessage(String lastMessage) {
+        this.lastMessage = lastMessage;
+    }
+
+    public Boolean getUnreadMessages() {
+        return unreadMessages;
+    }
+
+    public void setUnreadMessages(Boolean unreadMessages) {
+        this.unreadMessages = unreadMessages;
     }
 }

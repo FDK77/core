@@ -34,7 +34,7 @@ public class MessageController {
     }
 
     @GetMapping("/filter/{fid}")
-    public ResponseEntity<?> getMessagesByChatIdAndFilterId(@PathVariable Long fid) {
+    public ResponseEntity<?> getMessagesByFilterId(@PathVariable Long fid) {
         try {
             List<MessageDto> messages = messageService.getAllMessagesDtoByFilterId(fid);
             return ResponseEntity.ok(messages);

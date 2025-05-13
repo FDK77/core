@@ -3,12 +3,17 @@ package com.example.core.service;
 import com.example.core.dto.ChatDto;
 import com.example.core.dto.ChatSettingDto;
 import com.example.core.dto.FilterDto;
+import com.example.core.dto.TelegramChatDto;
 import com.example.core.models.Chat;
 import com.example.core.models.Filter;
+import com.example.core.models.Message;
 import com.example.core.models.Type;
 import com.example.core.repo.ChatRepo;
+import com.example.core.repo.MessageRepo;
 import com.example.core.service.interfaces.IChatService;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,46 +23,26 @@ import java.util.stream.Collectors;
 
 @Service
 public class ChatService implements IChatService {
-    private ChatRepo chatRepo;
-    private FilterService filterService;
-    private TelegramIntegrationService tgService;
+    private final ChatRepo chatRepo;
+    private final FilterService filterService;
+    private final MessageRepo messageRepo;
+    private final TelegramIntegrationService tgService;
 
-    private ModelMapper modelMapper;
     @Autowired
-    public ChatService(ChatRepo chatRepo, FilterService filterService, TelegramIntegrationService tgService, ModelMapper modelMapper) {
+    public ChatService(ChatRepo chatRepo, FilterService filterService, TelegramIntegrationService tgService, MessageRepo messageRepo) {
         this.chatRepo = chatRepo;
         this.filterService = filterService;
         this.tgService = tgService;
-        this.modelMapper = modelMapper;
+        this.messageRepo = messageRepo;
 
-        this.modelMapper.typeMap(Chat.class, ChatDto.class)
-                .addMappings(mapper -> {
-                    mapper.map(Chat::getChatId, ChatDto::setChatId);
-                    mapper.map(Chat::getTitle, ChatDto::setTitle);
-                    mapper.map(Chat::getType, ChatDto::setType);
-                });
-
-        this.modelMapper.addConverter(context -> {
-            Set<Filter> filters = context.getSource();
-            return filters.stream()
-                    .map(filter -> new FilterDto(
-                            filter.getId(),
-                            filter.getValue(),
-                            filter.getSummary(),
-                            filter.getColor(),
-                            filter.getName()
-                    ))
-                    .collect(Collectors.toList());
-        }, Set.class, List.class);
     }
 
 
-
     public void syncChatsWithTelegram() {
-        List<Map<String, Object>> telegramChats = tgService.getAllChats();
+        List<TelegramChatDto> tgChats = tgService.getAllChats();
 
-        List<Long> incomingIds = telegramChats.stream()
-                .map(chat -> ((Number) chat.get("chatId")).longValue())
+        List<Long> incomingIds = tgChats.stream()
+                .map(TelegramChatDto::getChatId)
                 .toList();
 
         List<Chat> existingChats = chatRepo.findAll();
@@ -71,11 +56,11 @@ public class ChatService implements IChatService {
         }
 
         List<Chat> chatsToSave = new ArrayList<>();
-        for (Map<String, Object> chatData : telegramChats) {
-            Long chatId = ((Number) chatData.get("chatId")).longValue();
-            String title = (String) chatData.get("title");
-            String typeStr = (String) chatData.get("type");
-            String avatar = (String) chatData.get("avatar");
+        for (TelegramChatDto dto : tgChats) {
+            Long chatId = dto.getChatId();
+            String title = dto.getTitle();
+            Type type = dto.getType();
+            String avatar = dto.getAvatar();
 
             Chat chat = chatRepo.findById(chatId).orElseGet(() -> {
                 Chat newChat = new Chat();
@@ -84,23 +69,24 @@ public class ChatService implements IChatService {
             });
 
             chat.setTitle(title);
+            chat.setAvatar(avatar);
 
-            if (typeStr != null) {
+            if (type != null) {
                 try {
-                    chat.setType(Type.valueOf(typeStr.toUpperCase()));
+                    chat.setType(type);
                 } catch (IllegalArgumentException e) {
                     chat.setType(Type.UNKNOWN);
                 }
             }
-            chat.setAvatar(avatar);
+
             chatsToSave.add(chat);
         }
 
         if (!chatsToSave.isEmpty()) {
             chatRepo.saveAll(chatsToSave);
         }
-
     }
+
 
     public List<Long> getChatIdsWithFilters() {
         return chatRepo.findAllChatIdsWithFilters();
@@ -149,9 +135,19 @@ public class ChatService implements IChatService {
     public List<ChatDto> getAllChatsDto() {
         List<Chat> chats = chatRepo.findAll();
         return chats.stream()
-                .map(chat -> modelMapper.map(chat, ChatDto.class))
+                .map(chat -> {
+                    ChatDto dto = new ChatDto();
+                    dto.setChatId(chat.getChatId());
+                    dto.setTitle(chat.getTitle());
+                    dto.setType(chat.getType());
+                    dto.setAvatar(chat.getAvatar());
+                    dto.setLastMessage(chat.getLastMessage());
+                    dto.setUnreadMessages(chatRepo.checkUnreadByChatId(chat.getChatId()));
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
+
 
     public Optional<Chat> getChatById(Long id) {
         return chatRepo.findById(id);

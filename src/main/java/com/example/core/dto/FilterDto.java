@@ -6,14 +6,16 @@ public class FilterDto {
     private Boolean summary;
     private String color;
     private String name;
+    private Boolean unreadMessages;
     public FilterDto() {}
 
-    public FilterDto(Long id, String value, Boolean summary, String color, String name) {
+    public FilterDto(Long id, String value, Boolean summary, String color, String name, Boolean unreadMessages) {
         this.id = id;
         this.value = value;
         this.summary = summary;
         this.color = color;
         this.name = name;
+        this.unreadMessages = unreadMessages;
     }
 
     public Long getId() {
@@ -54,5 +56,13 @@ public class FilterDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Boolean getUnreadMessages() {
+        return unreadMessages;
+    }
+
+    public void setUnreadMessages(Boolean unreadMessages) {
+        this.unreadMessages = unreadMessages;
     }
 }

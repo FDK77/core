@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface FilterRepo extends JpaRepository<Filter, Long> {
-    List<Filter> findByChatChatId(Long chatId);
+    List<Filter> findByChatChatIdOrderByIdAsc(Long chatId);
     void deleteByChatChatId(Long chatId);
 }

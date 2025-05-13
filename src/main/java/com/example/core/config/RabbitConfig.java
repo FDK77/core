@@ -20,25 +20,23 @@ public class RabbitConfig {
     public static final String CORE_TO_LLM_QUEUE = "core.to_llm";
 
     @Bean
+    public Queue telegramToCoreQueue() {
+        return new Queue(TELEGRAM_TO_CORE_QUEUE, true);
+    }
+    @Bean
+    public Queue coreToLlmQueue() {
+        return new Queue(CORE_TO_LLM_QUEUE, true);
+    }
+
+    @Bean
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
-
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter jsonMessageConverter) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(jsonMessageConverter);
         return template;
     }
-    @Bean
-    public Queue telegramToCoreQueue() {
-        return new Queue(TELEGRAM_TO_CORE_QUEUE, false);
-    }
-
-    @Bean
-    public Queue coreToLlmQueue() {
-        return new Queue(CORE_TO_LLM_QUEUE, true);
-    }
-
 
 }

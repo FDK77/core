@@ -1,65 +1,89 @@
 package com.example.core.service;
 
 
+import com.example.core.dto.SubscribeChatsRequestDto;
+import com.example.core.dto.SubscribedChatsResponseDto;
+import com.example.core.dto.TelegramChatDto;
+import com.example.core.dto.TelegramUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class TelegramIntegrationService {
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+
+    private final AvatarService avatarService;
 
     @Value("${telegram.service.base-url}")
     private String telegramBaseUrl;
-
     @Autowired
-    public TelegramIntegrationService(RestTemplate restTemplate) {
+    public TelegramIntegrationService(RestTemplate restTemplate, AvatarService avatarService) {
         this.restTemplate = restTemplate;
+        this.avatarService = avatarService;
     }
 
-
-    public List<Map<String, Object>> getAllChats() {
+    public List<TelegramChatDto> getAllChats() {
         String url = telegramBaseUrl + "/chats";
-        ResponseEntity<List> response = restTemplate.getForEntity(url, List.class);
-        return response.getBody();
+        ResponseEntity<List<TelegramChatDto>> resp = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {}
+        );
+
+        List<TelegramChatDto> chats = resp.getBody();
+        if (chats != null) {
+            chats.forEach(chat -> {
+                if (chat.getAvatar() != null) {
+                    avatarService.downloadAndSaveChatAvatar(chat.getChatId());
+                }
+            });
+        }
+
+        return chats;
     }
 
-    public Map<String, Object> getUserById(Long userId) {
+    public Optional<TelegramUserDto> getUserById(Long userId) {
         String url = telegramBaseUrl + "/user/" + userId;
         try {
-            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
-            return response.getBody();
-        } catch (Exception e) {
-            return null;
+            TelegramUserDto dto = restTemplate.getForObject(url, TelegramUserDto.class);
+            if (dto != null && dto.getAvatarPath() != null) {
+                avatarService.downloadAndSaveUserAvatar(dto.getUserId());
+            }
+            return Optional.ofNullable(dto);
+        } catch (HttpClientErrorException.NotFound ex) {
+            return Optional.empty();
         }
     }
-
 
     public List<Long> subscribeChats(List<Long> chatIds) {
         String url = telegramBaseUrl + "/subscribe_chats";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("chatIds", chatIds);
+        SubscribeChatsRequestDto requestDto = new SubscribeChatsRequestDto(chatIds);
+        HttpEntity<SubscribeChatsRequestDto> entity = new HttpEntity<>(requestDto, headers);
 
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
-        ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
+        ResponseEntity<SubscribedChatsResponseDto> response = restTemplate
+                .postForEntity(url, entity, SubscribedChatsResponseDto.class);
 
-        List<?> rawList = (List<?>) response.getBody().get("subscribedChats");
-        return rawList.stream()
-                .map(id -> ((Number) id).longValue())
-                .toList();
+        if (response.getBody() != null && response.getBody().getSubscribedChats() != null) {
+            return response.getBody().getSubscribedChats();
+        } else {
+            return List.of();
+        }
     }
+
 
 
 }

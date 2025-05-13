@@ -1,23 +1,17 @@
-package com.example.core.models;
+package com.example.core.dto;
 
-import jakarta.persistence.*;
-import lombok.Data;
-
-@Entity
-@Table(name = "tg_user")
-@Data
-public class User {
-    @Id
+public class TelegramUserDto {
     private Long userId;
     private String username;
     private String displayName;
     private String avatarPath;
     private String phoneNumber;
 
-    public User() {
+
+    public TelegramUserDto() {
     }
 
-    public User(Long userId, String username, String displayName, String avatarPath, String phoneNumber) {
+    public TelegramUserDto(Long userId, String username, String displayName, String avatarPath, String phoneNumber) {
         this.userId = userId;
         this.username = username;
         this.displayName = displayName;
@@ -53,15 +47,15 @@ public class User {
         return avatarPath;
     }
 
+    public void setAvatarPath(String avatarPath) {
+        this.avatarPath = avatarPath;
+    }
+
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public void setAvatarPath(String avatarPath) {
-        this.avatarPath = avatarPath;
     }
 }

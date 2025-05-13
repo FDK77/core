@@ -8,25 +8,17 @@ import java.util.List;
 @Entity
 @Table(name = "filter")
 public class Filter {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(nullable = false, columnDefinition = "TEXT")
-
     private String value;
-
     private String color;
-
     private String name;
-
     private Boolean summary;
-
     @ManyToOne
     @JoinColumn(name = "chat_id", nullable = false)
     private Chat chat;
-
     @OneToMany(mappedBy = "filter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages = new ArrayList<>();
 
@@ -98,4 +90,5 @@ public class Filter {
     public void setName(String name) {
         this.name = name;
     }
+
 }

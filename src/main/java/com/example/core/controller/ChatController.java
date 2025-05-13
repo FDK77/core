@@ -17,16 +17,20 @@ import java.util.List;
 public class ChatController {
     private ChatService chatService;
     private TelegramIntegrationService telegramService;
-
     @Autowired
     public ChatController(ChatService chatService, TelegramIntegrationService telegramService) {
         this.chatService = chatService;
         this.telegramService = telegramService;
     }
-
     @GetMapping
     public ResponseEntity<List<ChatDto>> getAllChats() {
         return ResponseEntity.ok(chatService.getAllChatsDto());
+    }
+
+    @PostMapping("/subscribe/{id}")
+    public ResponseEntity<List<Long>> subscribeToChat(@PathVariable Long id) {
+        List<Long> result = telegramService.subscribeChats(List.of(id));
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
@@ -54,10 +58,5 @@ public class ChatController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/subscribe/{id}")
-    public ResponseEntity<List<Long>> subscribeToChat(@PathVariable Long id) {
-        List<Long> result = telegramService.subscribeChats(List.of(id));
-        return ResponseEntity.ok(result);
-    }
 
 }
