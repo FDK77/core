@@ -1,11 +1,9 @@
 package com.example.core.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 @Entity
 @Table(name = "tg_user")
-@Data
 public class User {
     @Id
     private Long userId;

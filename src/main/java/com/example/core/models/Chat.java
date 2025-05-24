@@ -1,7 +1,6 @@
 package com.example.core.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.util.HashSet;
 import java.util.Set;
